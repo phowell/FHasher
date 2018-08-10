@@ -1,5 +1,5 @@
 [package]
-name = "FHasher"
+name = "fhasher"
 version = "0.1.0"
 authors = ["Peter Howell"]
 
