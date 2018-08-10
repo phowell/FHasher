@@ -4,7 +4,6 @@ cache: cargo
 dist: trusty
 os:
   - linux
-  - osx
 
 rust:
   - stable
@@ -17,7 +16,10 @@ matrix:
 
 
 before_install:
-  - sudo apt-get update
+  - |
+      if [[ "$TRAVIS_RUST_VERSION" == "stable" ]]; then
+        sudo apt-get update;
+      fi
 
 addons:
   apt:
