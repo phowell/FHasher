@@ -46,4 +46,6 @@ pub fn parse() {
                 .help("Set an alternate file name for the hash log file. Default is fhasher.log"),
         )
         .get_matches();
+
+    println!("{:?}", matches.args);
 }
