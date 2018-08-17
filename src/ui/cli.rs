@@ -1,4 +1,6 @@
 use clap::{App, Arg};
+use logfile;
+
 pub fn parse() {
     let matches = App::new("FHasher Portable Hashing Tool")
         .version(crate_version!())
@@ -47,5 +49,9 @@ pub fn parse() {
         )
         .get_matches();
 
-    println!("{:?}", matches.args);
+    let logfile = matches.value_of("Hash Log").unwrap();
+    let log = logfile::Log::open(logfile).unwrap();
+
+    println!("{}:", logfile);
+    println!("{:?}", log);
 }
