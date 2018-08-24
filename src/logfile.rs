@@ -1,13 +1,18 @@
-use hasher::Algorithm;
+use hasher::{hash_file, Algorithm};
 use serde_json;
-use std::{collections::HashMap, error::Error, fs::File, io::BufReader, path::Path};
+use std::{
+    collections::HashMap,
+    error::Error,
+    fs::{write, File},
+    io::BufReader,
+    path::Path,
+};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Log {
     #[serde(flatten)]
     pub meta: Metadata,
 
-    #[serde(flatten)]
     pub hashes: Vec<Entry>,
 }
 
@@ -33,7 +38,21 @@ impl Log {
         }
     }
 
-    fn add(&self, path: &Path, alg: Algorithm, hash: &String) -> Result<(), serde_json::Error> {
+    pub fn save(&self, path: &str) -> Result<(), Box<Error>> {
+        let pickle = serde_json::to_string_pretty(self)?;
+        write(path, pickle)?;
+        Ok(())
+    }
+
+    pub fn add(&mut self, p: &Path, alg: Algorithm) -> Result<(), Box<Error>> {
+        let hash = hash_file(alg, p);
+        let mut map = HashMap::new();
+        map.insert(alg.to_string(), hash);
+        let mut entry = Entry {
+            path: p.display().to_string(),
+            hashes: map,
+        };
+        self.hashes.push(entry);
         Ok(())
     }
 }

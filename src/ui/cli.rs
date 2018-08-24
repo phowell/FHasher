@@ -1,5 +1,7 @@
 use clap::{App, Arg};
+use hasher::Algorithm;
 use logfile;
+use std::path::Path;
 
 pub fn parse() {
     let matches = App::new("FHasher Portable Hashing Tool")
@@ -50,7 +52,17 @@ pub fn parse() {
         .get_matches();
 
     let logfile = matches.value_of("Hash Log").unwrap();
-    let log = logfile::Log::open(logfile).unwrap();
+    let file = Path::new(matches.value_of("Files").unwrap());
+    let mut log = logfile::Log::open(logfile).unwrap();
+    match log.add(file, Algorithm::Md5) {
+        Ok(()) => println!("Yay"),
+        Err(e) => println!("BOO: {}", e),
+    }
+
+    match log.save(logfile) {
+        Ok(()) => println!("File Saved"),
+        Err(e) => println!("File Not Saved: {}", e),
+    }
 
     println!("{}:", logfile);
     println!("{:?}", log);
