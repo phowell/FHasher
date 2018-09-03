@@ -5,6 +5,8 @@ authors = ["Peter Howell"]
 
 [dependencies]
 clap = "2.32.0"
+walkdir = "^2.2"
+
 
 serde = "^1.0"
 serde_derive = "^1.0"
