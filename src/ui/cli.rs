@@ -1,7 +1,8 @@
 use clap::{App, Arg};
 use hasher::Algorithm;
 use logfile;
-use std::path::Path;
+use std::borrow::ToOwned;
+use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 pub fn parse() {
@@ -52,26 +53,30 @@ pub fn parse() {
         )
         .get_matches();
 
-    //Having the default_value and the unwrap_or both producing fhasher.log makes this feel redundant
+    //Having the default_value (above) and the unwrap_or (here) both producing fhasher.log makes this feel redundant
     //TODO Investigate possible minor refactor here?
     let logfile = matches.value_of("Hash Log").unwrap_or("fhasher.log");
-    let mut files: Vec<String> = Vec::new();
+    let mut files: Vec<PathBuf> = Vec::new();
 
     if matches.is_present("Recursive") {
         for entry in WalkDir::new(".").into_iter().filter_map(|e| e.ok()) {
             if entry.file_type().is_file() {
-                files.push(entry.path().display().to_string());
+                files.push(entry.into_path());
             }
         }
     } else {
         if matches.is_present("Files") {
-            files.push(matches.values_of("Files").unwrap().collect());
+            for f in matches.values_of("Files").unwrap() {
+                let mut pb = PathBuf::new();
+                pb.push(f);
+                files.push(pb);
+            }
         }
         if matches.is_present("Folder") {
             for f in matches.values_of("Folder").unwrap() {
                 for entry in WalkDir::new(f).into_iter().filter_map(|e| e.ok()) {
                     if entry.file_type().is_file() {
-                        files.push(entry.path().display().to_string());
+                        files.push(entry.into_path());
                     }
                 }
             }
@@ -79,15 +84,16 @@ pub fn parse() {
     }
     println!("Files to be hashed:");
     println!("=============");
-    for f in files {
+    for f in &files {
         println!("{:?}", f);
     }
 
-    let file = Path::new(matches.value_of("Files").unwrap());
     let mut log = logfile::Log::open(logfile).unwrap();
-    match log.add(file, Algorithm::Md5) {
-        Ok(()) => println!("Yay"),
-        Err(e) => println!("BOO: {}", e),
+    for f in &files {
+        match log.add(f.as_path(), Algorithm::Md5) {
+            Ok(()) => println!("Yay"),
+            Err(e) => println!("BOO: {}", e),
+        }
     }
 
     match log.save(logfile) {
