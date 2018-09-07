@@ -1,8 +1,7 @@
 use clap::{App, Arg};
 use hasher::Algorithm;
 use logfile;
-use std::borrow::ToOwned;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use walkdir::WalkDir;
 
 pub fn parse() {
@@ -56,6 +55,7 @@ pub fn parse() {
     //Having the default_value (above) and the unwrap_or (here) both producing fhasher.log makes this feel redundant
     //TODO Investigate possible minor refactor here?
     let logfile = matches.value_of("Hash Log").unwrap_or("fhasher.log");
+    let algorithm = matches.value_of("Algorithm").unwrap();
     let mut files: Vec<PathBuf> = Vec::new();
 
     if matches.is_present("Recursive") {
@@ -82,15 +82,10 @@ pub fn parse() {
             }
         }
     }
-    println!("Files to be hashed:");
-    println!("=============");
-    for f in &files {
-        println!("{:?}", f);
-    }
 
     let mut log = logfile::Log::open(logfile).unwrap();
     for f in &files {
-        match log.add(f.as_path(), Algorithm::Md5) {
+        match log.add(f.as_path(), Algorithm::from_string(algorithm)) {
             Ok(()) => println!("Yay"),
             Err(e) => println!("BOO: {}", e),
         }
