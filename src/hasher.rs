@@ -9,6 +9,17 @@ pub enum Algorithm {
     Sha256,
 }
 
+impl Algorithm {
+    pub fn from_string(alg: &str) -> Algorithm {
+        match alg {
+            "md5" => Algorithm::Md5,
+            "sha1" => Algorithm::Sha1,
+            "sha256" => Algorithm::Sha256,
+            _ => panic!("That's not an algorithm"),
+        }
+    }
+}
+
 impl Display for Algorithm {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         let printable = match *self {
@@ -22,7 +33,11 @@ impl Display for Algorithm {
 }
 
 pub fn hash_file(alg: Algorithm, fp: &Path) -> String {
-    "fakehash".to_string()
+    match alg {
+        Algorithm::Md5 => md5(),
+        Algorithm::Sha1 => sha1(),
+        Algorithm::Sha256 => sha256(),
+    }
 }
 
 fn md5() -> String {

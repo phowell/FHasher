@@ -13,7 +13,7 @@ pub struct Log {
     #[serde(flatten)]
     pub meta: Metadata,
 
-    pub hashes: Vec<Entry>,
+    pub files: Vec<Entry>,
 }
 
 impl Log {
@@ -22,7 +22,7 @@ impl Log {
             meta: Metadata {
                 creation_date: "dategoeshere".to_string(),
             },
-            hashes: Vec::new(),
+            files: Vec::new(),
         }
     }
 
@@ -46,13 +46,26 @@ impl Log {
 
     pub fn add(&mut self, p: &Path, alg: Algorithm) -> Result<(), Box<Error>> {
         let hash = hash_file(alg, p);
-        let mut map = HashMap::new();
-        map.insert(alg.to_string(), hash);
-        let mut entry = Entry {
-            path: p.display().to_string(),
-            hashes: map,
-        };
-        self.hashes.push(entry);
+        let fp = p.display().to_string();
+        //map.insert(alg.to_string(), hash);
+        let mut found = false;
+        for mut f in self.files.iter_mut() {
+            if f.path == fp {
+                found = true;
+                if !f.hashes.contains_key(&alg.to_string()) {
+                    f.hashes.insert(alg.to_string(), hash.to_owned());
+                }
+            }
+        }
+        if !found {
+            let mut map = HashMap::new();
+            map.insert(alg.to_string(), hash.to_owned());
+            let entry = Entry {
+                path: fp,
+                hashes: map,
+            };
+            self.files.push(entry);
+        }
         Ok(())
     }
 }
