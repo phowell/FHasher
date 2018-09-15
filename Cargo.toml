@@ -11,3 +11,6 @@ walkdir = "^2.2"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
+
+#Hashing algorithms
+md-5 = "0.7.0"

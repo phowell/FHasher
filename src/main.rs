@@ -8,6 +8,8 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 
+extern crate md5;
+
 mod hasher;
 mod logfile;
 mod ui;
