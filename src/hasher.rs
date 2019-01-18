@@ -66,9 +66,9 @@ fn md5(fp: &Path) -> io::Result<String> {
 
     Ok(res)
 }
-fn sha1(fp: &Path) -> io::Result<String> {
+fn sha1(_fp: &Path) -> io::Result<String> {
     Ok("SHA1HashGoesHere".to_string())
 }
-fn sha256(fp: &Path) -> io::Result<String> {
+fn sha256(_fp: &Path) -> io::Result<String> {
     Ok("SHA256HashGoesHere".to_string())
 }
